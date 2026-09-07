@@ -23,7 +23,5 @@ A backend-only API for managing reservable campus resources such as study rooms,
 - Git / GitHub
 - Postman (for later testing)
 
-Using a consistent toolset across the course makes it easier to follow along with instruction, debug issues, and collaborate, since everyone is working from the same environment and constraints, similar to how real backend teams standardize their stack.
-
 ## Running the Server Locally
 1. Clone the repo:
