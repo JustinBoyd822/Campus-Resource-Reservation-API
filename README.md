@@ -87,6 +87,7 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - `src/app.js` - Express app and route setup
 - `src/db.js` - MySQL connection pool
 - `src/routes` - route definitions
+- `src/middleware` - `validateRequest.js` and `errorHandler.js`
 - `src/controllers` - request handling logic
 - `src/models` - database models
 - `src/config` - configuration
