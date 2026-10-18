@@ -111,4 +111,11 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - `GET` and `POST` endpoints for each, connected to MySQL with mysql2
 - Testing notes in `docs/milestone3_api_testing.md`
 
-**Not built yet:** validation, error handling, double-booking prevention, and authentication.
+
+**Module 4 (complete):** Middleware and business rules
+- Validation middleware applied to all POST routes (users, resources, reservations)
+- Centralized error handler registered last in `src/app.js`
+- Business rules: end time after start time, resource must exist, overlapping reservations rejected
+- Testing notes in `docs/milestone4_testing.md`
+
+**Not built yet:** authentication and authorization.
