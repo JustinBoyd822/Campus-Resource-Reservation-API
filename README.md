@@ -36,28 +36,32 @@ Using a consistent toolset across the course matters because backend development
 ### Steps
 1. Clone the repo:
 ```
-   git clone https://github.com/JustinBoyd822/Campus-Resource-Reservation-API.git
-   cd Campus-Resource-Reservation-API
+git clone https://github.com/JustinBoyd822/Campus-Resource-Reservation-API.git
+cd Campus-Resource-Reservation-API
 ```
+
 2. Install dependencies:
 ```
-   npm install
+npm install
 ```
+
 3. (Optional) To use a different port, create a `.env` file in the project root:
 ```
-   PORT=3000
+PORT=3000
 ```
-   If no `.env` file is present, the server uses port 3000 by default.
+If no `.env` file is present, the server uses port 3000 by default.
+
 4. Start the server:
 ```
-   npm start
+npm start
 ```
-   To restart automatically when files change, use `npm run dev` instead.
+To restart automatically when files change, use `npm run dev` instead.
+
 5. Test that it works by opening this in your browser or Postman:
 ```
-   http://localhost:3000/health
+http://localhost:3000/health
 ```
-   You should get a response confirming the server is running.
+You should get a response confirming the server is running.
 
 ## Database Setup
 The MySQL schema is in `database/milestone2_schema.sql`. To create the database and tables, run:
@@ -79,14 +83,16 @@ SELECT * FROM reservations;
 Each reservation links to one user and one resource through foreign keys. The schema also includes CHECK constraints that require a reservation's end time to be after its start time, limit reservation status to `active`, `cancelled`, or `completed`, and require capacity to be greater than zero. A design explanation is in `docs/milestone2_design_explanation.md`.
 
 ## Project Structure
-- `server.js` - server entry point
+- `src/server.js` - server entry point
+- `src/app.js` - Express app and route setup
+- `src/db.js` - MySQL connection pool
 - `src/routes` - route definitions
 - `src/controllers` - request handling logic
 - `src/models` - database models
 - `src/middleware` - middleware functions
 - `src/config` - configuration
 - `database/` - MySQL schema
-- `docs/` - design documentation
+- `docs/` - design and testing documentation
 
 ## Current Project Status
 **Module 1 (complete):** Express server foundation
@@ -100,9 +106,9 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - Constraints to prevent bad data and extra fields for realism
 - Design explanation documented in `docs/`
 
-***Module 3 (complete):** Basic REST API
+**Module 3 (complete):** Basic REST API
 - Express routes for users, resources, and reservations under `/api`
 - `GET` and `POST` endpoints for each, connected to MySQL with mysql2
 - Testing notes in `docs/milestone3_api_testing.md`
 
-**Not built yet: ** validation, error handling, double-booking prevention, and authentication. 
+**Not built yet:** validation, error handling, double-booking prevention, and authentication.
