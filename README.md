@@ -89,7 +89,6 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - `src/routes` - route definitions
 - `src/controllers` - request handling logic
 - `src/models` - database models
-- `src/middleware` - middleware functions
 - `src/config` - configuration
 - `database/` - MySQL schema
 - `docs/` - design and testing documentation
