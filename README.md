@@ -100,4 +100,9 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - Constraints to prevent bad data and extra fields for realism
 - Design explanation documented in `docs/`
 
-**Not built yet:** database connection from the server, API endpoints for resources and reservations, double-booking prevention, and authentication. These will be added in later modules.
+***Module 3 (complete):** Basic REST API
+- Express routes for users, resources, and reservations under `/api`
+- `GET` and `POST` endpoints for each, connected to MySQL with mysql2
+- Testing notes in `docs/milestone3_api_testing.md`
+
+**Not built yet: ** validation, error handling, double-booking prevention, and authentication. 
