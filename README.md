@@ -1,16 +1,16 @@
 # Campus Resource Reservation API
 
 ## Description
-A backend-only API for managing reservable campus resources such as study rooms, lab spaces, and equipment. Users will be able to view resource availability and create, update, and cancel reservations. This project is being built incrementally as part of a backend development course.
+A backend-only API for managing reservable campus resources such as study rooms, lab spaces, and equipment. Users can view resources, log in, and create reservations. This project is being built incrementally as part of a backend development course.
 
 ## Scope
 **In scope:**
 - Managing campus resources (study rooms, lab spaces, equipment)
-- Creating, viewing, updating, and canceling reservations
+- Creating and viewing reservations
 - Checking resource availability
+- User registration, login (JWT), and role-based access (`user` / `admin`)
 
 **Out of scope (for now):**
-- User authentication/authorization
 - Payment processing
 - Frontend/UI
 - Notifications (email/SMS)
@@ -20,9 +20,11 @@ The purpose of this system is to solve the problem of coordinating limited, shar
 ## Technologies Used
 - Node.js
 - Express.js
-- MySQL
+- MySQL (mysql2)
+- bcrypt (password hashing)
+- jsonwebtoken (JWT authentication)
 - Git / GitHub
-- Postman (for later testing)
+- Postman (for testing)
 
 Using a consistent toolset across the course matters because backend development rarely happens in isolation. In a real job, developers inherit existing codebases, work alongside teammates, and follow whatever stack a company has already standardized on. Sticking to one set of tools throughout this course mirrors that reality: it builds familiarity with a specific environment, makes debugging predictable since everyone hits the same kinds of issues, and reinforces good habits like using Git properly and structuring an Express app consistently.
 
@@ -45,19 +47,24 @@ cd Campus-Resource-Reservation-API
 npm install
 ```
 
-3. (Optional) To use a different port, create a `.env` file in the project root:
+3. Create a `.env` file in the project root:
 ```
 PORT=3000
+JWT_SECRET=your_long_random_secret_here
 ```
-If no `.env` file is present, the server uses port 3000 by default.
+`JWT_SECRET` is required. The server will not start without it. `PORT` is optional and defaults to 3000. The `.env` file is ignored by Git, so your secret is never pushed.
 
-4. Start the server:
+4. Set your MySQL password in `src/db.js`.
+
+5. Set up the database (see below).
+
+6. Start the server:
 ```
 npm start
 ```
 To restart automatically when files change, use `npm run dev` instead.
 
-5. Test that it works by opening this in your browser or Postman:
+7. Test that it works by opening this in your browser or Postman:
 ```
 http://localhost:3000/health
 ```
@@ -68,30 +75,66 @@ The MySQL schema is in `database/milestone2_schema.sql`. To create the database 
 ```
 mysql -u root -p < database/milestone2_schema.sql
 ```
-Running the script drops and recreates the `campus_reservation` database, so it is safe to re-run but will erase existing data. To check that it worked, log in to MySQL and run:
+Running the script drops and recreates the `campus_reservation` database, so it is safe to re-run but will erase existing data.
+
+Then apply the Milestone 5 authentication changes:
+```
+mysql -u root -p campus_reservation < database/milestone5_auth.sql
+```
+This adds the `password_hash` column, changes the default role to `user`, and limits roles to `user` and `admin`.
+
+To check that it worked, log in to MySQL and run:
 ```
 USE campus_reservation;
 SHOW TABLES;
-SELECT * FROM reservations;
+DESCRIBE users;
 ```
 
 ### Schema Overview
-- `users` - people who can log in and make reservations (name, unique email, role)
+- `users` - people who can log in and make reservations (name, unique email, hashed password, role)
 - `resources` - reservable rooms and equipment (name, type, location, description, capacity, active flag)
 - `reservations` - a user's booking of a resource for a time range (start and end time, purpose, status)
 
 Each reservation links to one user and one resource through foreign keys. The schema also includes CHECK constraints that require a reservation's end time to be after its start time, limit reservation status to `active`, `cancelled`, or `completed`, and require capacity to be greater than zero. A design explanation is in `docs/milestone2_design_explanation.md`.
 
+## Authentication and Authorization
+
+### Endpoints
+- `POST /auth/register` - body: `full_name`, `email`, `password` (min 8 characters). Hashes the password and creates a user with role `user`.
+- `POST /auth/login` - body: `email`, `password`. Returns a JWT that expires in 1 hour.
+
+Send the token on protected routes as a header:
+```
+Authorization: Bearer <token>
+```
+
+### Creating an admin
+Register a user normally, then promote them in MySQL:
+```
+UPDATE users SET role = 'admin' WHERE email = 'your_email@example.com';
+```
+Log in again afterward so the new token includes the admin role.
+
+### Protected routes
+| Route | Access |
+|---|---|
+| `POST /api/reservations` | any logged-in user |
+| `POST /api/resources` | admin only |
+| `GET /api/users` | admin only |
+| `POST /api/users` | admin only |
+
+All other routes (`/health`, `/auth/*`, `GET /api/resources`, `GET /api/reservations`) are public.
+
 ## Project Structure
 - `src/server.js` - server entry point
 - `src/app.js` - Express app and route setup
 - `src/db.js` - MySQL connection pool
-- `src/routes` - route definitions
-- `src/middleware` - `validateRequest.js` and `errorHandler.js`
+- `src/routes` - `auth.js`, `users.js`, `resources.js`, `reservations.js`
+- `src/middleware` - `validateRequest.js`, `errorHandler.js`, `authMiddleware.js`, `roleMiddleware.js`
 - `src/controllers` - request handling logic
 - `src/models` - database models
 - `src/config` - configuration
-- `database/` - MySQL schema
+- `database/` - MySQL schema and migrations
 - `docs/` - design and testing documentation
 
 ## Current Project Status
@@ -111,11 +154,16 @@ Each reservation links to one user and one resource through foreign keys. The sc
 - `GET` and `POST` endpoints for each, connected to MySQL with mysql2
 - Testing notes in `docs/milestone3_api_testing.md`
 
-
 **Module 4 (complete):** Middleware and business rules
 - Validation middleware applied to all POST routes (users, resources, reservations)
 - Centralized error handler registered last in `src/app.js`
 - Business rules: end time after start time, resource must exist, overlapping reservations rejected
 - Testing notes in `docs/milestone4_testing.md`
 
-**Not built yet:** authentication and authorization.
+**Module 5 (complete):** Authentication and authorization
+- Passwords hashed with bcrypt, never stored in plain text
+- `POST /auth/register` and `POST /auth/login` (returns a JWT)
+- `authMiddleware.js` verifies the token; `roleMiddleware.js` enforces `user` / `admin` roles
+- Reservation creation requires login; resource creation and user management require admin
+- Database migration in `database/milestone5_auth.sql`
+- Testing notes in `docs/milestone5_testing.md`
