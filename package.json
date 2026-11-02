@@ -19,12 +19,15 @@
     "url": "https://github.com/JustinBoyd822/Campus-Resource-Reservation-API/issues"
   },
   "homepage": "https://github.com/JustinBoyd822/Campus-Resource-Reservation-API#readme",
-  "dependencies": {
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "mysql2": "^3.11.0"
+"dependencies": {
+  "bcrypt": "^6.0.0",
+  "dotenv": "^17.4.2",
+  "express": "^5.2.1",
+  "jsonwebtoken": "^9.0.2",
+  "mysql2": "^3.11.0"
+},
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
   }
-}
+
