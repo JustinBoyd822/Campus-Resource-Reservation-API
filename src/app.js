@@ -1,6 +1,7 @@
 const express = require('express');
 
 // Route files
+const authRoutes = require('./routes/auth');
 const usersRoutes = require('./routes/users');
 const resourcesRoutes = require('./routes/resources');
 const reservationsRoutes = require('./routes/reservations');
@@ -19,6 +20,7 @@ app.get('/health', (req, res) => {
 });
 
 // 3. API routes
+app.use('/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/reservations', reservationsRoutes);
