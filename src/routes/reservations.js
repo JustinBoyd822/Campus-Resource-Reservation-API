@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const validate = require('../middleware/validateRequest');
+const auth = require('../middleware/authMiddleware');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -12,12 +13,15 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// Requires a valid token. The reservation is always made for the logged-in user.
 router.post(
   '/',
-  validate(['user_id', 'resource_id', 'start_time', 'end_time']),
+  auth,
+  validate(['resource_id', 'start_time', 'end_time']),
   async (req, res, next) => {
     try {
-      const { user_id, resource_id, start_time, end_time } = req.body;
+      const { resource_id, start_time, end_time } = req.body;
+      const user_id = req.user.user_id; // from the JWT, not the request body
 
       // Rule 1: end time must be after start time
       const start = new Date(start_time);
