@@ -7,25 +7,36 @@ const resourcesRoutes = require('./routes/resources');
 const reservationsRoutes = require('./routes/reservations');
 
 // Middleware
+const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// 1. Parse JSON request bodies (must come before the routes)
+// 1. Request logger (first, so every request is logged, even ones that fail)
+app.use(requestLogger);
+
+// 2. Parse JSON request bodies (must come before the routes)
 app.use(express.json());
 
-// 2. Health check
+// 3. Health check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
-// 3. API routes
+// 4. API routes
 app.use('/auth', authRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/resources', resourcesRoutes);
 app.use('/api/reservations', reservationsRoutes);
 
-// 4. Error handler (must come last, after all the routes)
+// 5. Unknown routes: forward a 404 to the error handler
+app.use((req, res, next) => {
+  const err = new Error('Route not found');
+  err.status = 404;
+  next(err);
+});
+
+// 6. Error handler (must come last, after all the routes)
 app.use(errorHandler);
 
 module.exports = app;
