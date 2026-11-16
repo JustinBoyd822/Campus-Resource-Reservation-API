@@ -19,6 +19,13 @@ router.post('/', auth, requireRole('admin'), validate(['resource_name', 'resourc
   try {
     const { resource_name, resource_type, location } = req.body;
 
+    if (typeof resource_name !== 'string' || typeof resource_type !== 'string') {
+      return res.status(400).json({ error: 'resource_name and resource_type must be text' });
+    }
+    if (resource_name.length > 100) {
+      return res.status(400).json({ error: 'resource_name must be 100 characters or less' });
+    }
+
     const [result] = await db.query(
       'INSERT INTO resources (resource_name, resource_type, location) VALUES (?, ?, ?)',
       [resource_name, resource_type, location || null]
