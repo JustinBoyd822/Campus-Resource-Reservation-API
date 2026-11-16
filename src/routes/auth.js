@@ -17,8 +17,11 @@ router.post(
     try {
       const { full_name, email, password } = req.body;
 
+      if (typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        return res.status(400).json({ error: 'email must be a valid email address' });
+      }
       if (typeof password !== 'string' || password.length < 8) {
-        return res.status(400).json({ error: 'Password must be at least 8 characters' });
+        return res.status(400).json({ error: 'password must be at least 8 characters' });
       }
 
       const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
